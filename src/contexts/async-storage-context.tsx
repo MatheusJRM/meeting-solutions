@@ -47,9 +47,13 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
   }, [providers, AsyncStorage]);
 
   const handleAddProvidersData = useCallback(
-    (data: ProviderDataProps): void => {
-      AsyncStorage.setItem("@provider-data", JSON.stringify(data));
-      setProviders([...providers, data]);
+    async (data: ProviderDataProps): Promise<void> => {
+      try {
+        await AsyncStorage.setItem("@provider-data", JSON.stringify(data));
+        setProviders([...providers, data]);
+      } catch (error) {
+        console.error("Erro ao salvar provider:", error);
+      }
     },
     [providers]
   );
