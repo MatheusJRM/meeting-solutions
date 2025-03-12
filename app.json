@@ -2,6 +2,7 @@
   "expo": {
     "name": "meeting-solutions",
     "slug": "meeting-solutions",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "newArchEnabled": true
   }
 }
