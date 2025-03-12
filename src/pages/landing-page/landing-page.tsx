@@ -1,9 +1,9 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import Logo from "@assets/images/logo.png";
-import { useNavigation } from "@react-navigation/native";
+import Logo from "assets/images/logo.png";
+import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 
 export const LandingPage = () => {
-  const { navigate } = useNavigation();
+  const { handleLogin } = useAsyncStorageContext();
   return (
     <View style={styles.container}>
       <Image source={Logo} style={styles.logo} />
@@ -13,7 +13,7 @@ export const LandingPage = () => {
           styles.button,
           pressed && styles.buttonPressed,
         ]}
-        onPress={() => navigate("home" as never)}
+        onPress={handleLogin}
       >
         <Text style={styles.buttonText}>ENTRAR</Text>
       </Pressable>

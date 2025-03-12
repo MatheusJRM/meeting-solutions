@@ -7,7 +7,8 @@ export const globalStyle = StyleSheet.create({
   },
   button: {
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingRight: 10,
+    paddingLeft: 20,
     borderRadius: 5,
   },
   buttonPressed: {

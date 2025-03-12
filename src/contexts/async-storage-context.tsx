@@ -5,15 +5,18 @@ import {
   AsyncStorageProviderProps,
   ProviderDataProps,
 } from "types/async-storage-context-types";
-import { useNavigation } from "@react-navigation/native";
 
 const AsyncStorageContext = createContext<AsyncStorageProps | undefined>(
   undefined
 );
 
 const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
-  const { navigate } = useNavigation();
   const [providers, setProviders] = useState<ProviderDataProps[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   const handleSaveProviders = async (
     providersToSave: ProviderDataProps[]
@@ -60,8 +63,8 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
 
   const handleLogout = (): void => {
     AsyncStorage.clear().then(() => {
+      setIsAuthenticated(false);
       setProviders([]);
-      navigate("landing" as never);
     });
   };
 
@@ -72,11 +75,13 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
   return (
     <AsyncStorageContext.Provider
       value={{
+        isAuthenticated,
         providers,
+        handleLogin,
         handleAddProvidersData,
         handleAddProfileImage,
         handleLogout,
-     }}
+      }}
     >
       {children}
     </AsyncStorageContext.Provider>
