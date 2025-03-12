@@ -14,42 +14,33 @@ import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { RegisterProviderPageProps } from "types/pages-types";
 import { DefaultButton } from "components/default-button/default-button";
+import { handleUploadImage } from "utils/image-upload";
+import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
+import { ProviderDataProps } from "types/async-storage-context-types";
 
 export const RegisterProviderPage = ({
   navigation,
 }: RegisterProviderPageProps) => {
+  const { handleAddProvidersData } = useAsyncStorageContext();
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
   const [products, setProducts] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
+  const handleAddImage = useCallback(async (): Promise<void> => {
+    const image = await handleUploadImage();
+    setProfileImage(image);
+  }, []);
+
   const handleRemoveImage = useCallback((): void => {
     setProfileImage(null);
   }, []);
 
-  const handleImageUpload = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permissão necessária",
-        "Precisamos acessar sua galeria para escolher uma imagem."
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
-    }
-  };
-
-  const handleRegister = () => {
+  const handleRegister = useCallback(() => {
     if (!name || !city || !phone || !products) {
+      console.log({ name, city, phone, products });
+
       Alert.alert(
         "Erro",
         "Todos os campos, exceto a imagem, são obrigatórios."
@@ -57,18 +48,26 @@ export const RegisterProviderPage = ({
       return;
     }
 
-    const providerData = {
-      name: name.trim(),
-      city: city.trim(),
-      phone: phone.trim(),
-      products: products.trim(),
-      profileImage,
+    const formattedProducts = products
+      .split(",")
+      .map((product) => product.trim())
+      .filter((product) => product.length > 0);
+
+    const providerData: ProviderDataProps = {
+      id: String(Math.random()),
+      nome: name.trim(),
+      cidade: city.trim(),
+      telefone: phone.trim(),
+      tiposProduto: formattedProducts,
+      imgPerfil: profileImage,
     };
 
-    console.info("Fornecedor cadastrado: ", providerData);
-    Alert.alert("Sucesso", "Fornecedor cadastrado com sucesso!");
-    // navigation.goBack();
-  };
+    handleAddProvidersData(providerData).then(() => {
+      Alert.alert("Sucesso", "Fornecedor cadastrado com sucesso!");
+      console.info("Fornecedor cadastrado: ", providerData);
+      // navigation.navigate("home");
+    });
+  }, [name, city, phone, products, profileImage]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -77,7 +76,7 @@ export const RegisterProviderPage = ({
       </Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite o nome do fornecedor"
+        placeholder="Ex.: Coca-Cola"
         value={name}
         onChangeText={setName}
       />
@@ -87,7 +86,7 @@ export const RegisterProviderPage = ({
       </Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite a cidade sede"
+        placeholder="Ex.: Atlanta"
         value={city}
         onChangeText={setCity}
       />
@@ -106,15 +105,24 @@ export const RegisterProviderPage = ({
       <Text style={styles.label}>
         Tipos de produtos vendidos <Text style={styles.icon}>*</Text>
       </Text>
+      <Text
+        style={{
+          fontSize: 14,
+        }}
+      >
+        (Separados por vírgula)
+      </Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite os tipos de produtos"
+        placeholder="Ex.: Eletrônicos, Limpeza, etc..."
         value={products}
         onChangeText={setProducts}
       />
 
       <Text style={styles.label}>Imagem de perfil</Text>
-      <Button title="Escolher imagem" onPress={handleImageUpload} />
+      <View style={styles.imageButton}>
+        <Button title="Escolher imagem" onPress={handleAddImage} />
+      </View>
       {profileImage && (
         <>
           <TouchableOpacity onPress={handleRemoveImage}>
@@ -122,7 +130,11 @@ export const RegisterProviderPage = ({
               name="remove"
               size={24}
               color="black"
-              style={{ alignSelf: "flex-end", right: "25%", top: "2%" }}
+              style={{
+                alignSelf: "flex-end",
+                paddingRight: "25%",
+                paddingTop: "2%",
+              }}
             />
           </TouchableOpacity>
           <Image source={{ uri: profileImage }} style={styles.image} />
@@ -144,7 +156,6 @@ export const RegisterProviderPage = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
     padding: 20,
   },
   label: {
@@ -162,6 +173,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 5,
     marginBottom: 15,
+  },
+  imageButton: {
+    marginTop: 5,
   },
   image: {
     width: 120,
