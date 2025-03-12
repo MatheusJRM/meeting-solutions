@@ -1,25 +1,44 @@
-import { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Pressable } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { WarningModal } from "components/modals/warning-modal";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { useWarningModal } from "hooks/useWarningModal";
-import { HomePage } from "pages/home-page/home-page";
-import { LandingPage } from "pages/landing-page/landing-page";
+import { HomePage } from "pages/private/home-page/home-page";
+import { LandingPage } from "pages/public/landing-page/landing-page";
 import { globalStyle } from "../../global-style";
+import { RegisterProviderPage } from "pages/private/register-provider-page/register-provider-page";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "types/navigation-types";
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 export const StackRoutes = () => {
+  const { goBack } = useNavigation();
   const { isAuthenticated, handleLogout } = useAsyncStorageContext();
   const { warningModalIsVisible, handleCloseModal, handleShowModal } =
     useWarningModal();
 
-  const handleConfirmFunction = () => {
+  const handleConfirmFunction = useCallback(() => {
     handleLogout();
     handleCloseModal();
-  };
+  }, []);
+
+  const handleHeaderLeftRender = useCallback(
+    (onPress: () => void) => (
+      <Pressable
+        style={({ pressed }) => [
+          globalStyle.button,
+          pressed && globalStyle.buttonPressed,
+        ]}
+        onPress={onPress}
+      >
+        <Ionicons name="arrow-back" size={20} color="black" />
+      </Pressable>
+    ),
+    []
+  );
 
   const publicRoutes = useMemo(
     () => (
@@ -34,25 +53,26 @@ export const StackRoutes = () => {
 
   const privateRoutes = useMemo(
     () => (
-      <Stack.Screen
-        name="home"
-        component={HomePage}
-        options={{
-          headerTitle: "Home",
-          headerLeft: () => (
-            <Pressable
-              style={({ pressed }) => [
-                globalStyle.button,
-                pressed && globalStyle.buttonPressed,
-              ]}
-              onPress={handleShowModal}
-            >
-              <Ionicons name="arrow-back" size={20} color="black" />
-            </Pressable>
-          ),
-          gestureEnabled: false,
-        }}
-      />
+      <React.Fragment>
+        <Stack.Screen
+          name="home"
+          component={HomePage}
+          options={{
+            headerTitle: "Home",
+            headerLeft: () => handleHeaderLeftRender(handleShowModal),
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="registerProvider"
+          component={RegisterProviderPage}
+          options={{
+            headerTitle: "Cadastro de Fornecedores",
+            headerLeft: () => handleHeaderLeftRender(goBack),
+            gestureEnabled: false,
+          }}
+        />
+      </React.Fragment>
     ),
     [warningModalIsVisible]
   );

@@ -1,6 +1,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import Logo from "assets/images/logo.png";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
+import { DefaultButton } from "components/default-button/default-button";
 
 export const LandingPage = () => {
   const { handleLogin } = useAsyncStorageContext();
@@ -8,15 +9,13 @@ export const LandingPage = () => {
     <View style={styles.container}>
       <Image source={Logo} style={styles.logo} />
       <Text style={styles.welcomeText}>Olá Fornecedor, seja bem-vindo!</Text>
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.buttonPressed,
-        ]}
+      <DefaultButton
         onPress={handleLogin}
+        color="#6c7ff0"
+        colorPressed="#e4d8d8"
       >
         <Text style={styles.buttonText}>ENTRAR</Text>
-      </Pressable>
+      </DefaultButton>
       <Text style={styles.footerText}>
         <Text style={styles.italicText}>Delivered by MatheusJRM</Text>
       </Text>
@@ -39,22 +38,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: "#333",
-  },
-  button: {
-    backgroundColor: "#6c7ff0",
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 25,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    marginTop: 40,
-  },
-  buttonPressed: {
-    backgroundColor: "#e4d8d8",
-    opacity: 0.7,
   },
   buttonText: {
     color: "#fff",
