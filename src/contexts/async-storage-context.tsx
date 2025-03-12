@@ -14,8 +14,9 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
   const [providers, setProviders] = useState<ProviderDataProps[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const handleLogin = () => {
+  const handleLogin = async (): Promise<void> => {
     setIsAuthenticated(true);
+    await AsyncStorage.setItem("@isAuthenticated", "true");
   };
 
   const handleSaveProviders = async (
@@ -32,12 +33,16 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
     }
   };
 
-  const handlefetchData = useCallback(async () => {
+  const handleFetchData = useCallback(async (): Promise<void> => {
+    const isAuthenticatedData = await AsyncStorage.getItem("@isAuthenticated");
     const data = await AsyncStorage.getItem("@provider-data");
-    if (data) {
-      setProviders(JSON.parse(data));
-    } else {
-      setProviders([]);
+    if (isAuthenticatedData) {
+      setIsAuthenticated(JSON.parse(isAuthenticatedData));
+      if (data) {
+        setProviders(JSON.parse(data));
+      } else {
+        setProviders([]);
+      }
     }
   }, [providers, AsyncStorage]);
 
@@ -69,7 +74,7 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
   };
 
   useEffect(() => {
-    handlefetchData();
+    handleFetchData();
   }, []);
 
   return (
