@@ -10,23 +10,28 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { RegisterProviderPageProps } from "types/pages-types";
+import { UpdateProviderPageProps } from "types/pages-types";
 import { DefaultButton } from "components/default-button/default-button";
 import { handleUploadImage } from "utils/image-upload";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { ProviderDataProps } from "types/async-storage-context-types";
 
-export const RegisterProviderPage = ({
+export const UpdateProviderPage = ({
   navigation,
-}: RegisterProviderPageProps) => {
-  const { handleAddProvidersData } = useAsyncStorageContext();
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
-  const [phone, setPhone] = useState("");
-  const [products, setProducts] = useState("");
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  route,
+}: UpdateProviderPageProps) => {
+  const { providerData } = route.params;
+  const { handleUpdateProvider } = useAsyncStorageContext();
+  const [name, setName] = useState(providerData.nome);
+  const [city, setCity] = useState(providerData.cidade);
+  const [phone, setPhone] = useState(providerData.telefone);
+  const [products, setProducts] = useState(
+    providerData?.tiposProduto.join(", ")
+  );
+  const [profileImage, setProfileImage] = useState<string | null>(
+    providerData.imgPerfil || null
+  );
 
   const handleAddImage = useCallback(async (): Promise<void> => {
     const image = await handleUploadImage();
@@ -37,7 +42,7 @@ export const RegisterProviderPage = ({
     setProfileImage(null);
   }, []);
 
-  const handleRegister = useCallback(() => {
+  const handleUpdate = useCallback(() => {
     if (!name || !city || !phone || !products) {
       Alert.alert(
         "Erro",
@@ -51,8 +56,8 @@ export const RegisterProviderPage = ({
       .map((product) => product.trim())
       .filter((product) => product.length > 0);
 
-    const providerData: ProviderDataProps = {
-      id: String(Math.random()),
+    const providerDataToSend: ProviderDataProps = {
+      id: providerData.id,
       nome: name.trim(),
       cidade: city.trim(),
       telefone: phone.trim(),
@@ -60,9 +65,9 @@ export const RegisterProviderPage = ({
       imgPerfil: profileImage,
     };
 
-    handleAddProvidersData(providerData).then(() => {
-      Alert.alert("Sucesso", "Fornecedor cadastrado com sucesso!");
-      console.info("Fornecedor cadastrado: ", providerData);
+    handleUpdateProvider(providerDataToSend).then(() => {
+      Alert.alert("Sucesso", "Fornecedor atualizado com sucesso!");
+      console.info("Fornecedor atualizado: ", providerDataToSend);
       navigation.navigate("home");
     });
   }, [name, city, phone, products, profileImage]);
@@ -141,11 +146,11 @@ export const RegisterProviderPage = ({
 
       <View style={styles.buttonContainer}>
         <DefaultButton
-          onPress={handleRegister}
+          onPress={handleUpdate}
           color="#6c7ff0"
           colorPressed="#e4d8d8"
         >
-          <Text style={styles.buttonText}>Cadastrar</Text>
+          <Text style={styles.buttonText}>Atualizar</Text>
         </DefaultButton>
       </View>
     </ScrollView>

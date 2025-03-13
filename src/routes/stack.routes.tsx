@@ -11,6 +11,7 @@ import { globalStyle } from "../../global-style";
 import { RegisterProviderPage } from "pages/private/register-provider-page/register-provider-page";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "types/navigation-types";
+import { UpdateProviderPage } from "pages/private/update-provider-page/update-provider-page";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -68,6 +69,15 @@ export const StackRoutes = () => {
           component={RegisterProviderPage}
           options={{
             headerTitle: "Cadastro de Fornecedores",
+            headerLeft: () => handleHeaderLeftRender(goBack),
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="updateProvider"
+          component={UpdateProviderPage}
+          options={{
+            headerTitle: "Atualização de Fornecedor",
             headerLeft: () => handleHeaderLeftRender(goBack),
             gestureEnabled: false,
           }}

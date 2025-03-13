@@ -14,24 +14,45 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
   const [providers, setProviders] = useState<ProviderDataProps[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const handleLogin = async (): Promise<void> => {
+  const handleLogin = useCallback(async (): Promise<void> => {
     setIsAuthenticated(true);
     await AsyncStorage.setItem("@isAuthenticated", "true");
-  };
+  }, []);
 
-  const handleSaveProviders = async (
-    providersToSave: ProviderDataProps[]
-  ): Promise<void> => {
-    try {
-      await AsyncStorage.setItem(
-        "@provider-data",
-        JSON.stringify(providersToSave)
-      );
-      console.info("Providers salvos com sucesso!");
-    } catch (error) {
-      console.error("Erro ao salvar providers:", error);
-    }
-  };
+  const handleUpdateAllProviders = useCallback(
+    async (providersToSave: ProviderDataProps[]): Promise<void> => {
+      try {
+        await AsyncStorage.setItem(
+          "@provider-data",
+          JSON.stringify(providersToSave)
+        );
+        console.info("Providers atualizados com sucesso!");
+      } catch (error) {
+        console.error("Erro ao atualizar providers:", error);
+      }
+    },
+    []
+  );
+
+  const handleUpdateProvider = useCallback(
+    async (providerToSave: ProviderDataProps): Promise<void> => {
+      try {
+        setProviders((prev) => {
+          const updatedProviders = prev.map((provider) => {
+            if (provider.id === providerToSave.id) return providerToSave;
+            return provider;
+          });
+          handleUpdateAllProviders(updatedProviders);
+
+          return updatedProviders;
+        });
+        console.info("Providers atualizados com sucesso!");
+      } catch (error) {
+        console.error("Erro ao atualizar providers:", error);
+      }
+    },
+    []
+  );
 
   const handleFetchData = useCallback(async (): Promise<void> => {
     const isAuthenticatedData = await AsyncStorage.getItem("@isAuthenticated");
@@ -44,13 +65,13 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
         setProviders([]);
       }
     }
-  }, [providers, AsyncStorage]);
+  }, [providers, isAuthenticated]);
 
   const handleAddProvidersData = useCallback(
     async (data: ProviderDataProps): Promise<void> => {
       try {
-        await AsyncStorage.setItem("@provider-data", JSON.stringify(data));
         setProviders([...providers, data]);
+        handleUpdateAllProviders([...providers, data]);
       } catch (error) {
         console.error("Erro ao salvar provider:", error);
       }
@@ -58,24 +79,24 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
     [providers]
   );
 
-  const handleAddProfileImage = (id: string, image: string) => {
+  const handleAddProfileImage = useCallback((id: string, image: string) => {
     setProviders((prev) => {
       const updatedProviders = prev.map((provider) =>
         provider.id === id ? { ...provider, imgPerfil: image } : provider
       );
 
-      handleSaveProviders(updatedProviders);
+      handleUpdateAllProviders(updatedProviders);
 
       return updatedProviders;
     });
-  };
+  }, []);
 
-  const handleLogout = (): void => {
+  const handleLogout = useCallback((): void => {
     AsyncStorage.clear().then(() => {
       setIsAuthenticated(false);
       setProviders([]);
     });
-  };
+  }, []);
 
   useEffect(() => {
     handleFetchData();
@@ -86,8 +107,10 @@ const AsyncStorageProvider = ({ children }: AsyncStorageProviderProps) => {
       value={{
         isAuthenticated,
         providers,
+        handleFetchData,
         handleLogin,
         handleAddProvidersData,
+        handleUpdateProvider,
         handleAddProfileImage,
         handleLogout,
       }}

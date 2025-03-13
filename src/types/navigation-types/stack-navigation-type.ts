@@ -1,11 +1,14 @@
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RegisterProviderPage } from 'pages/private/register-provider-page/register-provider-page';
+import { ProviderDataProps } from "types/async-storage-context-types";
 
 export type RootStackParamList = {
   landing: undefined;
   home: undefined;
   registerProvider: undefined;
+  updateProvider: {
+    providerData: ProviderDataProps;
+  };
 };
 
 export type StackNavigation<T extends keyof RootStackParamList> =

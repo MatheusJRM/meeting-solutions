@@ -1,16 +1,54 @@
-import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import React, { useCallback } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { ProviderCardProps } from "types/provider-card-types/provider-card-type";
+import { handleUploadImage } from "utils/image-upload";
 
-export const ProviderCard = ({ providerData }: ProviderCardProps) => {
-  const { nome, cidade, telefone, tiposProduto, imgPerfil } = providerData;
+export const ProviderCard = ({
+  providerData,
+  handleNavigate,
+}: ProviderCardProps) => {
+  const { handleAddProfileImage } = useAsyncStorageContext();
+  const { id, nome, cidade, telefone, tiposProduto, imgPerfil } = providerData;
+
+  const handleUpdateProfileImage = async () => {
+    const image = await handleUploadImage();
+    if (image) {
+      handleAddProfileImage(id, image);
+    }
+  };
 
   return (
     <View style={styles.card}>
-      {imgPerfil && <Image source={{ uri: imgPerfil }} style={styles.image} />}
+      <TouchableOpacity onPress={handleUpdateProfileImage}>
+        {imgPerfil ? (
+          <Image source={{ uri: imgPerfil }} style={styles.image} />
+        ) : (
+          <View style={{ width: 60, alignItems: "center" }}>
+            <Entypo name="image" size={24} color="black" style={styles.icon} />
+            <Text
+              style={{ flexWrap: "wrap", fontSize: 10, textAlign: "center" }}
+            >
+              Clique para inserir uma imagem
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
 
       <View style={styles.infoContainer}>
-        <Text style={styles.name}>{nome}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={styles.name}>{nome}</Text>
+          <TouchableOpacity onPress={() => handleNavigate(providerData)}>
+            <FontAwesome name="pencil-square-o" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.text}>Cidade: {cidade}</Text>
         <Text style={styles.text}>Telefone: {telefone}</Text>
         <Text style={styles.text}>Produtos: {tiposProduto.join(", ")}</Text>
@@ -26,13 +64,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
-    marginVertical: 10,
-    marginHorizontal: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+    gap: 10,
   },
   image: {
     width: 100,
@@ -40,10 +77,14 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     marginRight: 15,
   },
+  icon: {
+    padding: 10,
+  },
   infoContainer: {
     flex: 1,
   },
   name: {
+    width: "90%",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
