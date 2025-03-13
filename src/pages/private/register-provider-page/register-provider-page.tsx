@@ -17,6 +17,7 @@ import { DefaultButton } from "components/default-button/default-button";
 import { handleUploadImage } from "utils/image-upload";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { ProviderDataProps } from "types/async-storage-context-types";
+import { formatPhone, isPhoneComplete } from "utils/phone-format-functions";
 
 export const RegisterProviderPage = ({
   navigation,
@@ -37,15 +38,14 @@ export const RegisterProviderPage = ({
     setProfileImage(null);
   }, []);
 
-  const handleRegister = useCallback(() => {
-    if (!name || !city || !phone || !products) {
-      Alert.alert(
-        "Erro",
-        "Todos os campos, exceto a imagem, são obrigatórios."
-      );
-      return;
+  const isDisable = () => {
+    if (!name || !city || !phone || !products || !isPhoneComplete(phone)) {
+      return true;
     }
+    return false;
+  };
 
+  const handleRegister = useCallback(() => {
     const formattedProducts = products
       .split(",")
       .map((product) => product.trim())
@@ -90,15 +90,21 @@ export const RegisterProviderPage = ({
       />
 
       <Text style={styles.label}>
-        Telefone <Text style={styles.icon}>*</Text>
+        Telefone Celular <Text style={styles.icon}>*</Text>
       </Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite o telefone"
+        placeholder="Ex.: (XX) XXXXX-XXXX"
         value={phone}
-        onChangeText={setPhone}
+        onChangeText={(text) => setPhone(formatPhone(text))}
         keyboardType="phone-pad"
+        maxLength={15}
       />
+      {!!phone && !isPhoneComplete(phone) && (
+        <Text style={{ color: isPhoneComplete(phone) ? "green" : "red" }}>
+          Número incompleto
+        </Text>
+      )}
 
       <Text style={styles.label}>
         Tipos de produtos vendidos <Text style={styles.icon}>*</Text>
@@ -144,6 +150,7 @@ export const RegisterProviderPage = ({
           onPress={handleRegister}
           color="#6c7ff0"
           colorPressed="#e4d8d8"
+          disabled={isDisable()}
         >
           <Text style={styles.buttonText}>Cadastrar</Text>
         </DefaultButton>

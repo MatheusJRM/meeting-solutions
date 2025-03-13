@@ -6,6 +6,7 @@ export const DefaultButton = ({
   color,
   colorPressed,
   children,
+  disabled,
   ...props
 }: DefaultButtonProps) => {
   return (
@@ -14,9 +15,11 @@ export const DefaultButton = ({
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: color },
-        pressed && styles.buttonPressed && { backgroundColor: colorPressed },
+        (pressed || disabled) &&
+          styles.buttonPressed && { backgroundColor: colorPressed },
       ]}
       onPress={onPress}
+      disabled={disabled}
     >
       {children}
     </Pressable>
