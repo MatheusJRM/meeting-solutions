@@ -1,7 +1,7 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import Logo from "assets/images/logo.png";
-import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { DefaultButton } from "components/default-button/default-button";
+import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 
 export const LandingPage = () => {
   const { handleLogin } = useAsyncStorageContext();

@@ -10,7 +10,6 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { RegisterProviderPageProps } from "types/pages-types";
 import { DefaultButton } from "components/default-button/default-button";

@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { WarningModal } from "components/modals/warning-modal";
@@ -7,11 +8,10 @@ import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { useWarningModal } from "hooks/useWarningModal";
 import { HomePage } from "pages/private/home-page/home-page";
 import { LandingPage } from "pages/public/landing-page/landing-page";
-import { globalStyle } from "../../global-style";
-import { RegisterProviderPage } from "pages/private/register-provider-page/register-provider-page";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "types/navigation-types";
 import { UpdateProviderPage } from "pages/private/update-provider-page/update-provider-page";
+import { RegisterProviderPage } from "pages/private/register-provider-page/register-provider-page";
+import { RootStackParamList } from "types/navigation-types";
+import { globalStyle } from "../../global-style";
 
 const Stack = createStackNavigator<RootStackParamList>();
 

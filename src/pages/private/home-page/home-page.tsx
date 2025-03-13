@@ -1,11 +1,10 @@
+import { useCallback } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ProviderCard } from "components/provider-card/provider-card";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { HomePageProps } from "types/pages-types";
-import { useCallback, useEffect } from "react";
 import { ProviderDataProps } from "types/async-storage-context-types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const HomePage = ({ navigation }: HomePageProps) => {
   const { providers, handleFetchData } = useAsyncStorageContext();
