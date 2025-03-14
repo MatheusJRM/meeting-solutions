@@ -26,11 +26,9 @@ export const ProviderCard = ({
         {imgPerfil ? (
           <Image source={{ uri: imgPerfil }} style={styles.image} />
         ) : (
-          <View style={{ width: 60, alignItems: "center" }}>
+          <View style={styles.noImage}>
             <Entypo name="image" size={24} color="black" style={styles.icon} />
-            <Text
-              style={{ flexWrap: "wrap", fontSize: 10, textAlign: "center" }}
-            >
+            <Text style={styles.noImageText}>
               Clique para inserir uma imagem
             </Text>
           </View>
@@ -76,6 +74,16 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 60,
     marginRight: 15,
+  },
+  noImage: {
+    width: 100,
+    marginRight: 15,
+    alignItems: "center",
+  },
+  noImageText: {
+    flexWrap: "wrap",
+    fontSize: 10,
+    textAlign: "center",
   },
   icon: {
     padding: 10,
