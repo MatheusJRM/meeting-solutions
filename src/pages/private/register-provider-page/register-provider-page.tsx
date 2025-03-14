@@ -121,7 +121,7 @@ export const RegisterProviderPage = ({
         value={products}
         onChangeText={setProducts}
       />
-
+      
       <Text style={styles.label}>Imagem de perfil</Text>
       <View style={styles.imageButton}>
         <Button title="Escolher imagem" onPress={handleAddImage} />
@@ -160,6 +160,7 @@ export const RegisterProviderPage = ({
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: 20,
   },
   label: {
