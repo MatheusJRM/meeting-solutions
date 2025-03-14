@@ -5,7 +5,6 @@ import {
   TextInput,
   Button,
   ScrollView,
-  StyleSheet,
   Alert,
   Image,
   TouchableOpacity,
@@ -17,6 +16,8 @@ import { handleUploadImage } from "utils/image-upload";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { ProviderDataProps } from "types/async-storage-context-types";
 import { formatPhone, isPhoneComplete } from "utils/phone-format-functions";
+import { isDisable } from "utils/form-provider-disable-check";
+import { styles } from "utils/register-and-update-style";
 
 export const RegisterProviderPage = ({
   navigation,
@@ -36,13 +37,6 @@ export const RegisterProviderPage = ({
   const handleRemoveImage = useCallback((): void => {
     setProfileImage(null);
   }, []);
-
-  const isDisable = () => {
-    if (!name || !city || !phone || !products || !isPhoneComplete(phone)) {
-      return true;
-    }
-    return false;
-  };
 
   const handleRegister = useCallback(() => {
     const formattedProducts = products
@@ -121,7 +115,7 @@ export const RegisterProviderPage = ({
         value={products}
         onChangeText={setProducts}
       />
-      
+
       <Text style={styles.label}>Imagem de perfil</Text>
       <View style={styles.imageButton}>
         <Button title="Escolher imagem" onPress={handleAddImage} />
@@ -133,11 +127,7 @@ export const RegisterProviderPage = ({
               name="remove"
               size={24}
               color="black"
-              style={{
-                alignSelf: "flex-end",
-                paddingRight: "25%",
-                paddingTop: "2%",
-              }}
+              style={styles.removeIcon}
             />
           </TouchableOpacity>
           <Image source={{ uri: profileImage }} style={styles.image} />
@@ -149,7 +139,7 @@ export const RegisterProviderPage = ({
           onPress={handleRegister}
           color="#6c7ff0"
           colorPressed="#e4d8d8"
-          disabled={isDisable()}
+          disabled={isDisable(name, city, phone, products)}
         >
           <Text style={styles.buttonText}>Cadastrar</Text>
         </DefaultButton>
@@ -157,47 +147,3 @@ export const RegisterProviderPage = ({
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  icon: {
-    color: "red",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginTop: 5,
-    marginBottom: 15,
-  },
-  imageButton: {
-    marginTop: 5,
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginTop: 10,
-    alignSelf: "center",
-    resizeMode: "stretch",
-  },
-  buttonContainer: {
-    marginTop: "auto",
-    marginBottom: "5%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-});

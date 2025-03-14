@@ -5,7 +5,6 @@ import {
   TextInput,
   Button,
   ScrollView,
-  StyleSheet,
   Alert,
   Image,
   TouchableOpacity,
@@ -16,6 +15,8 @@ import { DefaultButton } from "components/default-button/default-button";
 import { handleUploadImage } from "utils/image-upload";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { ProviderDataProps } from "types/async-storage-context-types";
+import { isDisable } from "utils/form-provider-disable-check";
+import { styles } from "utils/register-and-update-style";
 
 export const UpdateProviderPage = ({
   navigation,
@@ -43,14 +44,6 @@ export const UpdateProviderPage = ({
   }, []);
 
   const handleUpdate = useCallback(() => {
-    if (!name || !city || !phone || !products) {
-      Alert.alert(
-        "Erro",
-        "Todos os campos, exceto a imagem, são obrigatórios."
-      );
-      return;
-    }
-
     const formattedProducts = products
       .split(",")
       .map((product) => product.trim())
@@ -133,11 +126,7 @@ export const UpdateProviderPage = ({
               name="remove"
               size={24}
               color="black"
-              style={{
-                alignSelf: "flex-end",
-                paddingRight: "25%",
-                paddingTop: "2%",
-              }}
+              style={styles.removeIcon}
             />
           </TouchableOpacity>
           <Image source={{ uri: profileImage }} style={styles.image} />
@@ -149,6 +138,7 @@ export const UpdateProviderPage = ({
           onPress={handleUpdate}
           color="#6c7ff0"
           colorPressed="#e4d8d8"
+          disabled={isDisable(name, city, phone, products)}
         >
           <Text style={styles.buttonText}>Atualizar</Text>
         </DefaultButton>
@@ -156,46 +146,3 @@ export const UpdateProviderPage = ({
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  icon: {
-    color: "red",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginTop: 5,
-    marginBottom: 15,
-  },
-  imageButton: {
-    marginTop: 5,
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginTop: 10,
-    alignSelf: "center",
-    resizeMode: "stretch",
-  },
-  buttonContainer: {
-    marginTop: "auto",
-    marginBottom: "5%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-});
