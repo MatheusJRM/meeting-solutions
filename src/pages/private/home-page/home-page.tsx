@@ -1,9 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
+  NativeSyntheticEvent,
   StyleSheet,
   Text,
   TextInput,
+  TextInputChangeEventData,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -12,9 +14,23 @@ import { ProviderCard } from "components/provider-card/provider-card";
 import { useAsyncStorageContext } from "hooks/useAsyncStorageContext";
 import { HomePageProps } from "types/pages-types";
 import { ProviderDataProps } from "types/async-storage-context-types";
+import { handleSeachProvider } from "utils/provider-search";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const HomePage = ({ navigation }: HomePageProps) => {
-  const { providers, handleFetchData } = useAsyncStorageContext();
+  const { providers } = useAsyncStorageContext();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredProviders = providers.filter((provider) =>
+    handleSeachProvider(provider, searchTerm)
+  );
+
+  const handleChangeSearchTerm = useCallback(
+    (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+      setSearchTerm(e.nativeEvent.text);
+    },
+    [searchTerm]
+  );
 
   const handleNavigateRegisterProviderPage = useCallback(
     () => navigation.navigate("registerProvider"),
@@ -26,6 +42,8 @@ export const HomePage = ({ navigation }: HomePageProps) => {
       navigation.navigate("updateProvider", { providerData: providerData }),
     []
   );
+
+  useFocusEffect(useCallback(() => setSearchTerm(""), []));
 
   return (
     <View style={styles.container}>
@@ -42,16 +60,19 @@ export const HomePage = ({ navigation }: HomePageProps) => {
         <View style={styles.searchContainer}>
           <AntDesign name="search1" size={24} color="black" />
           <TextInput
+            autoCapitalize="none"
             style={styles.searchInput}
             placeholder="Pesquisar"
             placeholderTextColor="#999"
+            onChange={handleChangeSearchTerm}
+            value={searchTerm}
           />
         </View>
       </View>
 
-      {providers.length > 0 && (
+      {filteredProviders.length > 0 && (
         <FlatList
-          data={providers}
+          data={filteredProviders}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.flatListContainer}
           showsVerticalScrollIndicator={false}
