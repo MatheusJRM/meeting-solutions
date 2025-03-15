@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   NativeSyntheticEvent,
@@ -21,8 +21,10 @@ export const HomePage = ({ navigation }: HomePageProps) => {
   const { providers } = useAsyncStorageContext();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredProviders = providers.filter((provider) =>
-    handleSeachProvider(provider, searchTerm)
+  const filteredProviders = useMemo<ProviderDataProps[]>(
+    () =>
+      providers.filter((provider) => handleSeachProvider(provider, searchTerm)),
+    [providers, searchTerm]
   );
 
   const handleChangeSearchTerm = useCallback(
